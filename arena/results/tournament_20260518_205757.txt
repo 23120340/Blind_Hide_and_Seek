@@ -1,0 +1,50 @@
+Blind Hide and Seek Tournament
+Time: 20260518_205757
+Candidates: ultra_agent, main_agent
+Opponents: main_agent, lookahead_agent, frontier_agent, codex_agent, hybrid_agent, trap_agent, montecarlo_agent, example_student, random_agent
+Settings: max_steps=200, speed=2, capture=2, obs=(5, 5), start=deterministic
+
+
+Candidate: ultra_agent
+  vs main_agent         [SEEK] LOSE     200 steps
+  vs main_agent         [HIDE] WIN      200 steps
+  vs lookahead_agent    [SEEK] WIN        6 steps
+  vs lookahead_agent    [HIDE] LOSE      87 steps
+  vs frontier_agent     [SEEK] WIN        6 steps
+  vs frontier_agent     [HIDE] LOSE      87 steps
+  vs codex_agent        [SEEK] WIN        6 steps
+  vs codex_agent        [HIDE] WIN      200 steps
+  vs hybrid_agent       [SEEK] WIN        6 steps
+  vs hybrid_agent       [HIDE] LOSE      87 steps
+  vs trap_agent         [SEEK] WIN        5 steps
+  vs trap_agent         [HIDE] LOSE      47 steps
+  vs montecarlo_agent   [SEEK] WIN        6 steps
+  vs montecarlo_agent   [HIDE] WIN      200 steps
+  vs example_student    [SEEK] WIN        6 steps
+  vs example_student    [HIDE] LOSE     133 steps
+  vs random_agent       [SEEK] WIN        9 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=12, losses=6, win_rate=66.7%, avg_seek=27.8, avg_hide=137.9, tie=110.1
+
+Candidate: main_agent
+  vs lookahead_agent    [SEEK] WIN        6 steps
+  vs lookahead_agent    [HIDE] LOSE      85 steps
+  vs frontier_agent     [SEEK] WIN        6 steps
+  vs frontier_agent     [HIDE] LOSE      85 steps
+  vs codex_agent        [SEEK] WIN        6 steps
+  vs codex_agent        [HIDE] WIN      200 steps
+  vs hybrid_agent       [SEEK] WIN        6 steps
+  vs hybrid_agent       [HIDE] LOSE      85 steps
+  vs trap_agent         [SEEK] WIN        5 steps
+  vs trap_agent         [HIDE] LOSE      47 steps
+  vs montecarlo_agent   [SEEK] WIN        6 steps
+  vs montecarlo_agent   [HIDE] LOSE     184 steps
+  vs example_student    [SEEK] WIN        8 steps
+  vs example_student    [HIDE] WIN      200 steps
+  vs random_agent       [SEEK] WIN        9 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=11, losses=5, win_rate=68.8%, avg_seek=6.5, avg_hide=135.8, tie=129.2
+
+Ranking:
+1. main_agent         win_rate= 68.8% wins=11/16 avg_seek=  6.5 avg_hide=135.8 tie= 129.2
+2. ultra_agent        win_rate= 66.7% wins=12/18 avg_seek= 27.8 avg_hide=137.9 tie= 110.1

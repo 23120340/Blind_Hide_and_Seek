@@ -1,0 +1,222 @@
+Blind Hide and Seek Role Tournament
+Time: 20260518_213118
+Agents: codex_agent, cycle_agent, example_student, frontier_agent, fusion_agent, hybrid_agent, lookahead_agent, main_agent, minimax_agent, montecarlo_agent, random_agent, trap_agent, ultra_agent, voronoi_agent
+Settings: max_steps=200, speed=2, capture=2, obs=(5, 5), start=deterministic
+
+Invalid/skipped:
+
+Seek ranking:
+ 1. trap_agent         wr=100.0% wins=13/13 avg_seek=  17.4 errors=0
+ 2. hybrid_agent       wr=100.0% wins=13/13 avg_seek=  22.3 errors=0
+ 3. lookahead_agent    wr=100.0% wins=13/13 avg_seek=  22.3 errors=0
+ 4. frontier_agent     wr=100.0% wins=13/13 avg_seek=  30.6 errors=0
+ 5. codex_agent        wr= 84.6% wins=11/13 avg_seek=  61.5 errors=0
+ 6. example_student    wr= 76.9% wins=10/13 avg_seek=  83.5 errors=0
+ 7. montecarlo_agent   wr= 76.9% wins=10/13 avg_seek=  84.6 errors=0
+ 8. minimax_agent      wr= 76.9% wins=10/13 avg_seek=  86.8 errors=0
+ 9. fusion_agent       wr= 69.2% wins= 9/13 avg_seek=  65.8 errors=0
+10. main_agent         wr= 69.2% wins= 9/13 avg_seek=  65.8 errors=0
+11. ultra_agent        wr= 69.2% wins= 9/13 avg_seek=  65.8 errors=0
+12. voronoi_agent      wr= 69.2% wins= 9/13 avg_seek=  65.8 errors=0
+13. cycle_agent        wr= 69.2% wins= 9/13 avg_seek=  66.0 errors=0
+14. random_agent       wr=  0.0% wins= 0/13 avg_seek= 200.0 errors=0
+
+Hide ranking:
+ 1. main_agent         wr= 69.2% wins= 9/13 avg_hide= 162.2 errors=0
+ 2. ultra_agent        wr= 61.5% wins= 8/13 avg_hide= 151.5 errors=0
+ 3. voronoi_agent      wr= 46.2% wins= 6/13 avg_hide= 105.1 errors=0
+ 4. fusion_agent       wr= 38.5% wins= 5/13 avg_hide= 104.2 errors=0
+ 5. cycle_agent        wr= 38.5% wins= 5/13 avg_hide= 102.2 errors=0
+ 6. codex_agent        wr= 23.1% wins= 3/13 avg_hide=  54.8 errors=0
+ 7. lookahead_agent    wr=  7.7% wins= 1/13 avg_hide=  58.6 errors=0
+ 8. hybrid_agent       wr=  7.7% wins= 1/13 avg_hide=  56.2 errors=0
+ 9. minimax_agent      wr=  7.7% wins= 1/13 avg_hide=  27.5 errors=0
+10. random_agent       wr=  7.7% wins= 1/13 avg_hide=  24.9 errors=0
+11. trap_agent         wr=  7.7% wins= 1/13 avg_hide=  23.8 errors=0
+12. montecarlo_agent   wr=  7.7% wins= 1/13 avg_hide=  23.0 errors=0
+13. example_student    wr=  7.7% wins= 1/13 avg_hide=  22.8 errors=0
+14. frontier_agent     wr=  7.7% wins= 1/13 avg_hide=  21.8 errors=0
+
+Match details:
+codex_agent        vs cycle_agent        winner=seek steps=84
+codex_agent        vs example_student    winner=seek steps=7
+codex_agent        vs frontier_agent     winner=seek steps=9
+codex_agent        vs fusion_agent       winner=seek steps=84
+codex_agent        vs hybrid_agent       winner=seek steps=71
+codex_agent        vs lookahead_agent    winner=seek steps=71
+codex_agent        vs main_agent         winner=hide steps=200
+codex_agent        vs minimax_agent      winner=seek steps=7
+codex_agent        vs montecarlo_agent   winner=seek steps=8
+codex_agent        vs random_agent       winner=seek steps=11
+codex_agent        vs trap_agent         winner=seek steps=19
+codex_agent        vs ultra_agent        winner=hide steps=200
+codex_agent        vs voronoi_agent      winner=seek steps=28
+cycle_agent        vs codex_agent        winner=seek steps=6
+cycle_agent        vs example_student    winner=seek steps=8
+cycle_agent        vs frontier_agent     winner=seek steps=6
+cycle_agent        vs fusion_agent       winner=hide steps=200
+cycle_agent        vs hybrid_agent       winner=seek steps=6
+cycle_agent        vs lookahead_agent    winner=seek steps=6
+cycle_agent        vs main_agent         winner=hide steps=200
+cycle_agent        vs minimax_agent      winner=seek steps=6
+cycle_agent        vs montecarlo_agent   winner=seek steps=6
+cycle_agent        vs random_agent       winner=seek steps=9
+cycle_agent        vs trap_agent         winner=seek steps=5
+cycle_agent        vs ultra_agent        winner=hide steps=200
+cycle_agent        vs voronoi_agent      winner=hide steps=200
+example_student    vs codex_agent        winner=seek steps=58
+example_student    vs cycle_agent        winner=seek steps=62
+example_student    vs frontier_agent     winner=seek steps=12
+example_student    vs fusion_agent       winner=seek steps=88
+example_student    vs hybrid_agent       winner=seek steps=14
+example_student    vs lookahead_agent    winner=seek steps=46
+example_student    vs main_agent         winner=hide steps=200
+example_student    vs minimax_agent      winner=seek steps=90
+example_student    vs montecarlo_agent   winner=seek steps=26
+example_student    vs random_agent       winner=hide steps=200
+example_student    vs trap_agent         winner=seek steps=28
+example_student    vs ultra_agent        winner=seek steps=61
+example_student    vs voronoi_agent      winner=hide steps=200
+frontier_agent     vs codex_agent        winner=seek steps=6
+frontier_agent     vs cycle_agent        winner=seek steps=74
+frontier_agent     vs example_student    winner=seek steps=8
+frontier_agent     vs fusion_agent       winner=seek steps=74
+frontier_agent     vs hybrid_agent       winner=seek steps=6
+frontier_agent     vs lookahead_agent    winner=seek steps=6
+frontier_agent     vs main_agent         winner=seek steps=87
+frontier_agent     vs minimax_agent      winner=seek steps=6
+frontier_agent     vs montecarlo_agent   winner=seek steps=6
+frontier_agent     vs random_agent       winner=seek steps=11
+frontier_agent     vs trap_agent         winner=seek steps=5
+frontier_agent     vs ultra_agent        winner=seek steps=87
+frontier_agent     vs voronoi_agent      winner=seek steps=22
+fusion_agent       vs codex_agent        winner=seek steps=6
+fusion_agent       vs cycle_agent        winner=hide steps=200
+fusion_agent       vs example_student    winner=seek steps=6
+fusion_agent       vs frontier_agent     winner=seek steps=6
+fusion_agent       vs hybrid_agent       winner=seek steps=6
+fusion_agent       vs lookahead_agent    winner=seek steps=6
+fusion_agent       vs main_agent         winner=hide steps=200
+fusion_agent       vs minimax_agent      winner=seek steps=6
+fusion_agent       vs montecarlo_agent   winner=seek steps=6
+fusion_agent       vs random_agent       winner=seek steps=9
+fusion_agent       vs trap_agent         winner=seek steps=5
+fusion_agent       vs ultra_agent        winner=hide steps=200
+fusion_agent       vs voronoi_agent      winner=hide steps=200
+hybrid_agent       vs codex_agent        winner=seek steps=6
+hybrid_agent       vs cycle_agent        winner=seek steps=20
+hybrid_agent       vs example_student    winner=seek steps=8
+hybrid_agent       vs frontier_agent     winner=seek steps=6
+hybrid_agent       vs fusion_agent       winner=seek steps=20
+hybrid_agent       vs lookahead_agent    winner=seek steps=6
+hybrid_agent       vs main_agent         winner=seek steps=87
+hybrid_agent       vs minimax_agent      winner=seek steps=6
+hybrid_agent       vs montecarlo_agent   winner=seek steps=6
+hybrid_agent       vs random_agent       winner=seek steps=11
+hybrid_agent       vs trap_agent         winner=seek steps=5
+hybrid_agent       vs ultra_agent        winner=seek steps=87
+hybrid_agent       vs voronoi_agent      winner=seek steps=22
+lookahead_agent    vs codex_agent        winner=seek steps=6
+lookahead_agent    vs cycle_agent        winner=seek steps=20
+lookahead_agent    vs example_student    winner=seek steps=8
+lookahead_agent    vs frontier_agent     winner=seek steps=6
+lookahead_agent    vs fusion_agent       winner=seek steps=20
+lookahead_agent    vs hybrid_agent       winner=seek steps=6
+lookahead_agent    vs main_agent         winner=seek steps=87
+lookahead_agent    vs minimax_agent      winner=seek steps=6
+lookahead_agent    vs montecarlo_agent   winner=seek steps=6
+lookahead_agent    vs random_agent       winner=seek steps=11
+lookahead_agent    vs trap_agent         winner=seek steps=5
+lookahead_agent    vs ultra_agent        winner=seek steps=87
+lookahead_agent    vs voronoi_agent      winner=seek steps=22
+main_agent         vs codex_agent        winner=seek steps=6
+main_agent         vs cycle_agent        winner=hide steps=200
+main_agent         vs example_student    winner=seek steps=6
+main_agent         vs frontier_agent     winner=seek steps=6
+main_agent         vs fusion_agent       winner=hide steps=200
+main_agent         vs hybrid_agent       winner=seek steps=6
+main_agent         vs lookahead_agent    winner=seek steps=6
+main_agent         vs minimax_agent      winner=seek steps=6
+main_agent         vs montecarlo_agent   winner=seek steps=6
+main_agent         vs random_agent       winner=seek steps=9
+main_agent         vs trap_agent         winner=seek steps=5
+main_agent         vs ultra_agent        winner=hide steps=200
+main_agent         vs voronoi_agent      winner=hide steps=200
+minimax_agent      vs codex_agent        winner=hide steps=200
+minimax_agent      vs cycle_agent        winner=seek steps=24
+minimax_agent      vs example_student    winner=seek steps=16
+minimax_agent      vs frontier_agent     winner=seek steps=6
+minimax_agent      vs fusion_agent       winner=seek steps=24
+minimax_agent      vs hybrid_agent       winner=seek steps=197
+minimax_agent      vs lookahead_agent    winner=seek steps=197
+minimax_agent      vs main_agent         winner=hide steps=200
+minimax_agent      vs montecarlo_agent   winner=seek steps=9
+minimax_agent      vs random_agent       winner=seek steps=13
+minimax_agent      vs trap_agent         winner=seek steps=17
+minimax_agent      vs ultra_agent        winner=hide steps=200
+minimax_agent      vs voronoi_agent      winner=seek steps=26
+montecarlo_agent   vs codex_agent        winner=hide steps=200
+montecarlo_agent   vs cycle_agent        winner=seek steps=24
+montecarlo_agent   vs example_student    winner=seek steps=6
+montecarlo_agent   vs frontier_agent     winner=seek steps=6
+montecarlo_agent   vs fusion_agent       winner=seek steps=24
+montecarlo_agent   vs hybrid_agent       winner=seek steps=197
+montecarlo_agent   vs lookahead_agent    winner=seek steps=197
+montecarlo_agent   vs main_agent         winner=hide steps=200
+montecarlo_agent   vs minimax_agent      winner=seek steps=6
+montecarlo_agent   vs random_agent       winner=seek steps=11
+montecarlo_agent   vs trap_agent         winner=seek steps=5
+montecarlo_agent   vs ultra_agent        winner=hide steps=200
+montecarlo_agent   vs voronoi_agent      winner=seek steps=24
+random_agent       vs codex_agent        winner=hide steps=200
+random_agent       vs cycle_agent        winner=hide steps=200
+random_agent       vs example_student    winner=hide steps=200
+random_agent       vs frontier_agent     winner=hide steps=200
+random_agent       vs fusion_agent       winner=hide steps=200
+random_agent       vs hybrid_agent       winner=hide steps=200
+random_agent       vs lookahead_agent    winner=hide steps=200
+random_agent       vs main_agent         winner=hide steps=200
+random_agent       vs minimax_agent      winner=hide steps=200
+random_agent       vs montecarlo_agent   winner=hide steps=200
+random_agent       vs trap_agent         winner=hide steps=200
+random_agent       vs ultra_agent        winner=hide steps=200
+random_agent       vs voronoi_agent      winner=hide steps=200
+trap_agent         vs codex_agent        winner=seek steps=6
+trap_agent         vs cycle_agent        winner=seek steps=20
+trap_agent         vs example_student    winner=seek steps=11
+trap_agent         vs frontier_agent     winner=seek steps=9
+trap_agent         vs fusion_agent       winner=seek steps=20
+trap_agent         vs hybrid_agent       winner=seek steps=9
+trap_agent         vs lookahead_agent    winner=seek steps=9
+trap_agent         vs main_agent         winner=seek steps=47
+trap_agent         vs minimax_agent      winner=seek steps=7
+trap_agent         vs montecarlo_agent   winner=seek steps=8
+trap_agent         vs random_agent       winner=seek steps=11
+trap_agent         vs ultra_agent        winner=seek steps=47
+trap_agent         vs voronoi_agent      winner=seek steps=22
+ultra_agent        vs codex_agent        winner=seek steps=6
+ultra_agent        vs cycle_agent        winner=hide steps=200
+ultra_agent        vs example_student    winner=seek steps=6
+ultra_agent        vs frontier_agent     winner=seek steps=6
+ultra_agent        vs fusion_agent       winner=hide steps=200
+ultra_agent        vs hybrid_agent       winner=seek steps=6
+ultra_agent        vs lookahead_agent    winner=seek steps=6
+ultra_agent        vs main_agent         winner=hide steps=200
+ultra_agent        vs minimax_agent      winner=seek steps=6
+ultra_agent        vs montecarlo_agent   winner=seek steps=6
+ultra_agent        vs random_agent       winner=seek steps=9
+ultra_agent        vs trap_agent         winner=seek steps=5
+ultra_agent        vs voronoi_agent      winner=hide steps=200
+voronoi_agent      vs codex_agent        winner=seek steps=6
+voronoi_agent      vs cycle_agent        winner=hide steps=200
+voronoi_agent      vs example_student    winner=seek steps=6
+voronoi_agent      vs frontier_agent     winner=seek steps=6
+voronoi_agent      vs fusion_agent       winner=hide steps=200
+voronoi_agent      vs hybrid_agent       winner=seek steps=6
+voronoi_agent      vs lookahead_agent    winner=seek steps=6
+voronoi_agent      vs main_agent         winner=hide steps=200
+voronoi_agent      vs minimax_agent      winner=seek steps=6
+voronoi_agent      vs montecarlo_agent   winner=seek steps=6
+voronoi_agent      vs random_agent       winner=seek steps=9
+voronoi_agent      vs trap_agent         winner=seek steps=5
+voronoi_agent      vs ultra_agent        winner=hide steps=200
