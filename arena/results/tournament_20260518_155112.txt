@@ -1,0 +1,108 @@
+Blind Hide and Seek Tournament
+Time: 20260518_155112
+Candidates: main_agent, lookahead_agent, frontier_agent, codex_agent, hybrid_agent
+Opponents: main_agent, lookahead_agent, frontier_agent, codex_agent, hybrid_agent, trap_agent, montecarlo_agent, example_student, random_agent
+Settings: max_steps=200, speed=2, capture=2, obs=(5, 5), start=deterministic
+
+
+Candidate: main_agent
+  vs lookahead_agent    [SEEK] WIN        6 steps
+  vs lookahead_agent    [HIDE] LOSE       6 steps
+  vs frontier_agent     [SEEK] WIN        6 steps
+  vs frontier_agent     [HIDE] LOSE       6 steps
+  vs codex_agent        [SEEK] WIN        6 steps
+  vs codex_agent        [HIDE] WIN      200 steps
+  vs hybrid_agent       [SEEK] WIN        6 steps
+  vs hybrid_agent       [HIDE] LOSE       6 steps
+  vs trap_agent         [SEEK] WIN        5 steps
+  vs trap_agent         [HIDE] LOSE       6 steps
+  vs montecarlo_agent   [SEEK] WIN        6 steps
+  vs montecarlo_agent   [HIDE] WIN      200 steps
+  vs example_student    [SEEK] WIN        8 steps
+  vs example_student    [HIDE] LOSE      22 steps
+  vs random_agent       [SEEK] WIN       11 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=11, losses=5, win_rate=68.8%, avg_seek=6.8, avg_hide=80.8, tie=74.0
+
+Candidate: lookahead_agent
+  vs main_agent         [SEEK] WIN        6 steps
+  vs main_agent         [HIDE] LOSE       6 steps
+  vs frontier_agent     [SEEK] WIN        6 steps
+  vs frontier_agent     [HIDE] LOSE       6 steps
+  vs codex_agent        [SEEK] WIN        6 steps
+  vs codex_agent        [HIDE] LOSE      71 steps
+  vs hybrid_agent       [SEEK] WIN        6 steps
+  vs hybrid_agent       [HIDE] LOSE       6 steps
+  vs trap_agent         [SEEK] WIN        5 steps
+  vs trap_agent         [HIDE] LOSE       9 steps
+  vs montecarlo_agent   [SEEK] WIN        6 steps
+  vs montecarlo_agent   [HIDE] LOSE     197 steps
+  vs example_student    [SEEK] WIN        6 steps
+  vs example_student    [HIDE] LOSE      36 steps
+  vs random_agent       [SEEK] WIN       11 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=9, losses=7, win_rate=56.2%, avg_seek=6.5, avg_hide=66.4, tie=59.9
+
+Candidate: frontier_agent
+  vs main_agent         [SEEK] WIN        6 steps
+  vs main_agent         [HIDE] LOSE       6 steps
+  vs lookahead_agent    [SEEK] WIN        6 steps
+  vs lookahead_agent    [HIDE] LOSE       6 steps
+  vs codex_agent        [SEEK] WIN        6 steps
+  vs codex_agent        [HIDE] LOSE       9 steps
+  vs hybrid_agent       [SEEK] WIN        6 steps
+  vs hybrid_agent       [HIDE] LOSE       6 steps
+  vs trap_agent         [SEEK] WIN        5 steps
+  vs trap_agent         [HIDE] LOSE       9 steps
+  vs montecarlo_agent   [SEEK] WIN        6 steps
+  vs montecarlo_agent   [HIDE] LOSE       6 steps
+  vs example_student    [SEEK] WIN        8 steps
+  vs example_student    [HIDE] LOSE     162 steps
+  vs random_agent       [SEEK] WIN       11 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=9, losses=7, win_rate=56.2%, avg_seek=6.8, avg_hide=50.5, tie=43.8
+
+Candidate: codex_agent
+  vs main_agent         [SEEK] LOSE     200 steps
+  vs main_agent         [HIDE] LOSE       6 steps
+  vs lookahead_agent    [SEEK] WIN       71 steps
+  vs lookahead_agent    [HIDE] LOSE       6 steps
+  vs frontier_agent     [SEEK] WIN        9 steps
+  vs frontier_agent     [HIDE] LOSE       6 steps
+  vs hybrid_agent       [SEEK] WIN       71 steps
+  vs hybrid_agent       [HIDE] LOSE       6 steps
+  vs trap_agent         [SEEK] WIN       19 steps
+  vs trap_agent         [HIDE] LOSE       6 steps
+  vs montecarlo_agent   [SEEK] WIN        8 steps
+  vs montecarlo_agent   [HIDE] WIN      200 steps
+  vs example_student    [SEEK] WIN       18 steps
+  vs example_student    [HIDE] LOSE      18 steps
+  vs random_agent       [SEEK] WIN       11 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=9, losses=7, win_rate=56.2%, avg_seek=50.9, avg_hide=56.0, tie=5.1
+
+Candidate: hybrid_agent
+  vs main_agent         [SEEK] WIN        6 steps
+  vs main_agent         [HIDE] LOSE       6 steps
+  vs lookahead_agent    [SEEK] WIN        6 steps
+  vs lookahead_agent    [HIDE] LOSE       6 steps
+  vs frontier_agent     [SEEK] WIN        6 steps
+  vs frontier_agent     [HIDE] LOSE       6 steps
+  vs codex_agent        [SEEK] WIN        6 steps
+  vs codex_agent        [HIDE] LOSE      71 steps
+  vs trap_agent         [SEEK] WIN        5 steps
+  vs trap_agent         [HIDE] LOSE       9 steps
+  vs montecarlo_agent   [SEEK] WIN        6 steps
+  vs montecarlo_agent   [HIDE] LOSE     197 steps
+  vs example_student    [SEEK] WIN        6 steps
+  vs example_student    [HIDE] LOSE      32 steps
+  vs random_agent       [SEEK] WIN       11 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=9, losses=7, win_rate=56.2%, avg_seek=6.5, avg_hide=65.9, tie=59.4
+
+Ranking:
+1. main_agent         win_rate= 68.8% wins=11/16 avg_seek=  6.8 avg_hide= 80.8 tie=  74.0
+2. lookahead_agent    win_rate= 56.2% wins= 9/16 avg_seek=  6.5 avg_hide= 66.4 tie=  59.9
+3. hybrid_agent       win_rate= 56.2% wins= 9/16 avg_seek=  6.5 avg_hide= 65.9 tie=  59.4
+4. frontier_agent     win_rate= 56.2% wins= 9/16 avg_seek=  6.8 avg_hide= 50.5 tie=  43.8
+5. codex_agent        win_rate= 56.2% wins= 9/16 avg_seek= 50.9 avg_hide= 56.0 tie=   5.1

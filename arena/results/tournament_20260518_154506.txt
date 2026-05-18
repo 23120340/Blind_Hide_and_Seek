@@ -1,0 +1,56 @@
+Blind Hide and Seek Tournament
+Time: 20260518_154506
+Candidates: codex_agent, lookahead_agent, hybrid_agent, frontier_agent, trap_agent, montecarlo_agent
+Opponents: example_student, random_agent
+Settings: max_steps=200, speed=2, capture=2, obs=(5, 5), start=stochastic
+
+
+Candidate: codex_agent
+  vs example_student    [SEEK] WIN       37 steps
+  vs example_student    [HIDE] WIN      200 steps
+  vs random_agent       [SEEK] WIN        9 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=4, losses=0, win_rate=100.0%, avg_seek=23.0, avg_hide=200.0, tie=177.0
+
+Candidate: lookahead_agent
+  vs example_student    [SEEK] WIN       18 steps
+  vs example_student    [HIDE] LOSE      18 steps
+  vs random_agent       [SEEK] WIN       87 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=3, losses=1, win_rate=75.0%, avg_seek=52.5, avg_hide=109.0, tie=56.5
+
+Candidate: hybrid_agent
+  vs example_student    [SEEK] WIN       30 steps
+  vs example_student    [HIDE] WIN      200 steps
+  vs random_agent       [SEEK] WIN       28 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=4, losses=0, win_rate=100.0%, avg_seek=29.0, avg_hide=200.0, tie=171.0
+
+Candidate: frontier_agent
+  vs example_student    [SEEK] WIN       14 steps
+  vs example_student    [HIDE] LOSE      81 steps
+  vs random_agent       [SEEK] WIN       27 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=3, losses=1, win_rate=75.0%, avg_seek=20.5, avg_hide=140.5, tie=120.0
+
+Candidate: trap_agent
+  vs example_student    [SEEK] WIN       18 steps
+  vs example_student    [HIDE] LOSE      90 steps
+  vs random_agent       [SEEK] WIN       32 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=3, losses=1, win_rate=75.0%, avg_seek=25.0, avg_hide=145.0, tie=120.0
+
+Candidate: montecarlo_agent
+  vs example_student    [SEEK] WIN       30 steps
+  vs example_student    [HIDE] WIN      200 steps
+  vs random_agent       [SEEK] WIN        9 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=4, losses=0, win_rate=100.0%, avg_seek=19.5, avg_hide=200.0, tie=180.5
+
+Ranking:
+1. montecarlo_agent   win_rate=100.0% wins= 4/4  avg_seek= 19.5 avg_hide=200.0 tie= 180.5
+2. codex_agent        win_rate=100.0% wins= 4/4  avg_seek= 23.0 avg_hide=200.0 tie= 177.0
+3. hybrid_agent       win_rate=100.0% wins= 4/4  avg_seek= 29.0 avg_hide=200.0 tie= 171.0
+4. frontier_agent     win_rate= 75.0% wins= 3/4  avg_seek= 20.5 avg_hide=140.5 tie= 120.0
+5. trap_agent         win_rate= 75.0% wins= 3/4  avg_seek= 25.0 avg_hide=145.0 tie= 120.0
+6. lookahead_agent    win_rate= 75.0% wins= 3/4  avg_seek= 52.5 avg_hide=109.0 tie=  56.5

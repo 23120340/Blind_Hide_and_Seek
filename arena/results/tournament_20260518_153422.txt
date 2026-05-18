@@ -1,0 +1,24 @@
+Blind Hide and Seek Tournament
+Time: 20260518_153422
+Candidates: codex_agent, lookahead_agent
+Opponents: example_student, random_agent
+Settings: max_steps=200, speed=2, capture=2, obs=(5, 5), start=stochastic
+
+
+Candidate: codex_agent
+  vs example_student    [SEEK] WIN       39 steps
+  vs example_student    [HIDE] LOSE     102 steps
+  vs random_agent       [SEEK] WIN        7 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=3, losses=1, win_rate=75.0%, avg_seek=23.0, avg_hide=151.0, tie=128.0
+
+Candidate: lookahead_agent
+  vs example_student    [SEEK] WIN       22 steps
+  vs example_student    [HIDE] LOSE      62 steps
+  vs random_agent       [SEEK] WIN       21 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=3, losses=1, win_rate=75.0%, avg_seek=21.5, avg_hide=131.0, tie=109.5
+
+Ranking:
+1. codex_agent        win_rate= 75.0% wins= 3/4  avg_seek= 23.0 avg_hide=151.0 tie= 128.0
+2. lookahead_agent    win_rate= 75.0% wins= 3/4  avg_seek= 21.5 avg_hide=131.0 tie= 109.5

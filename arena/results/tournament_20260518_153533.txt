@@ -1,0 +1,44 @@
+Blind Hide and Seek Tournament
+Time: 20260518_153533
+Candidates: codex_agent, lookahead_agent, hybrid_agent
+Opponents: codex_agent, lookahead_agent, hybrid_agent, example_student, random_agent
+Settings: max_steps=200, speed=2, capture=2, obs=(5, 5), start=stochastic
+
+
+Candidate: codex_agent
+  vs lookahead_agent    [SEEK] WIN       20 steps
+  vs lookahead_agent    [HIDE] LOSE      95 steps
+  vs hybrid_agent       [SEEK] LOSE     200 steps
+  vs hybrid_agent       [HIDE] LOSE      22 steps
+  vs example_student    [SEEK] WIN       35 steps
+  vs example_student    [HIDE] WIN      200 steps
+  vs random_agent       [SEEK] WIN       34 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=5, losses=3, win_rate=62.5%, avg_seek=72.2, avg_hide=129.2, tie=57.0
+
+Candidate: lookahead_agent
+  vs codex_agent        [SEEK] WIN       28 steps
+  vs codex_agent        [HIDE] LOSE     175 steps
+  vs hybrid_agent       [SEEK] WIN       17 steps
+  vs hybrid_agent       [HIDE] LOSE      21 steps
+  vs example_student    [SEEK] WIN       20 steps
+  vs example_student    [HIDE] WIN      200 steps
+  vs random_agent       [SEEK] WIN       18 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=6, losses=2, win_rate=75.0%, avg_seek=20.8, avg_hide=149.0, tie=128.2
+
+Candidate: hybrid_agent
+  vs codex_agent        [SEEK] LOSE     200 steps
+  vs codex_agent        [HIDE] WIN      200 steps
+  vs lookahead_agent    [SEEK] WIN       10 steps
+  vs lookahead_agent    [HIDE] LOSE      21 steps
+  vs example_student    [SEEK] WIN       15 steps
+  vs example_student    [HIDE] LOSE     135 steps
+  vs random_agent       [SEEK] WIN        6 steps
+  vs random_agent       [HIDE] WIN      200 steps
+  Summary: wins=5, losses=3, win_rate=62.5%, avg_seek=57.8, avg_hide=139.0, tie=81.2
+
+Ranking:
+1. lookahead_agent    win_rate= 75.0% wins= 6/8  avg_seek= 20.8 avg_hide=149.0 tie= 128.2
+2. hybrid_agent       win_rate= 62.5% wins= 5/8  avg_seek= 57.8 avg_hide=139.0 tie=  81.2
+3. codex_agent        win_rate= 62.5% wins= 5/8  avg_seek= 72.2 avg_hide=129.2 tie=  57.0

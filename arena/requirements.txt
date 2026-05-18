@@ -1,0 +1,12 @@
+numpy
+pyomo
+cvxpy
+gekko
+ortools
+cpmpy
+pycsp3
+minizinc
+pandas
+scikit-learn
+scipy
+pandas
