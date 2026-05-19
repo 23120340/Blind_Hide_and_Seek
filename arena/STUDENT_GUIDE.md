@@ -20,6 +20,16 @@ Welcome to the Pacman vs Ghost Arena! This guide will help you implement your ow
 
 ## Quick Start
 
+### Official Scope And RAM Budget
+
+Submit only your final `agent.py` package. Tournament scripts, analysis notes, and extra comparison agents are local tools for testing; they are not required in the final submission zip.
+
+The updated PDF requires the total RAM increase from before running to while the agent is running to be at most **100MB**. Design your agent as normal Python search logic:
+
+- Keep state compact: sets, dicts, small grids, short histories, and cached BFS results are fine.
+- Avoid heavyweight libraries, ML models, file-backed databases, network calls, background threads, or large precomputed tables.
+- Run `python arena/src/check_agent_ram.py --all` from the project root before submitting.
+
 ### 1. Create Your Submission Folder
 
 ```bash

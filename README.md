@@ -4,6 +4,18 @@ AI agents for the Blind Adversary / Hide and Seek Arena assignment.
 
 The project is organized so the original framework, custom agents, benchmark runner, results, and submission zips are easy to find.
 
+## Assignment Scope And RAM Budget
+
+The source of truth is `docs/BlindArena-2526-2.pdf`. For submission, the required artifact is still a single folder/zip containing `agent.py` with `PacmanAgent` and `GhostAgent`.
+
+Everything else in this repository is support material:
+
+- `arena/src/run_tournament.py`, `arena/src/role_tournament.py`, and `arena/results/` are local benchmarking tools.
+- The compared agents are references for testing and design exploration.
+- The GitHub references at the end are algorithm inspiration notes, not required dependencies or copied source.
+
+The updated PDF sets a hard resource budget: the difference between total RAM before running and while the agent is running must be at most **100MB**. Keep the final agent lightweight: no model downloads, no large lookup tables, no background processes, and no heavyweight third-party dependencies beyond the arena requirement (`numpy`).
+
 ## Structure
 
 ```text
@@ -106,6 +118,8 @@ This is intentionally not a deep minimax tree. The arena is small, but each step
 
 `cycle_agent`, `fusion_agent`, `minimax_agent`, `ultra_agent`, `voronoi_agent`: additional agents added later for comparison. The latest role tournament includes them.
 
+`seek_predictor_agent`: experimental seeker that predicts the fixed hider opening. It catches fixed-opening hiders much faster, but is not selected for `agent_main` because its average seek time is worse against adaptive hiders.
+
 `random_agent`: valid random baseline.
 
 ## Benchmark Commands
@@ -145,6 +159,12 @@ Results are written to:
 ```text
 arena/results/latest_results.txt
 arena/results/latest_role_results.txt
+```
+
+RAM budget check:
+
+```bash
+python arena/src/check_agent_ram.py --all
 ```
 
 ## Latest Results
