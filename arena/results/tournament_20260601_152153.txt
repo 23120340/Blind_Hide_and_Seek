@@ -1,7 +1,7 @@
 Blind Hide and Seek Tournament
-Time: 20260601_151718
+Time: 20260601_152153
 Candidates: agent_main
-Opponents: 11, 12, 14, 15, 18, 3, 4, 7, 8, codex_agent, example_student, frontier_agent, hybrid_agent, lookahead_agent, seek_predictor_agent, trap_agent
+Opponents: 11, 12, 14, 15, 18, 3, 4, 7, 8, agent_main, codex_agent, example_student, frontier_agent, hybrid_agent, lookahead_agent, seek_predictor_agent, trap_agent
 Settings: max_steps=200, speed=2, capture=2, obs=(5, 5), start=deterministic
 
 
@@ -20,14 +20,14 @@ Candidate: agent_main
   vs 3                  [HIDE] LOSE      81 steps
   vs 4                  [SEEK] WIN        6 steps
   vs 4                  [HIDE] LOSE      73 steps
-  vs 7                  [SEEK] WIN        5 steps
+  vs 7                  [SEEK] WIN        6 steps
   vs 7                  [HIDE] LOSE      77 steps
   vs 8                  [SEEK] WIN        5 steps
   vs 8                  [HIDE] LOSE      73 steps
   vs codex_agent        [SEEK] WIN       10 steps
   vs codex_agent        [HIDE] WIN      200 steps
-  vs example_student    [SEEK] WIN        6 steps
-  vs example_student    [HIDE] LOSE     139 steps
+  vs example_student    [SEEK] WIN        8 steps
+  vs example_student    [HIDE] LOSE     152 steps
   vs frontier_agent     [SEEK] WIN       10 steps
   vs frontier_agent     [HIDE] LOSE      49 steps
   vs hybrid_agent       [SEEK] WIN       12 steps
@@ -38,7 +38,7 @@ Candidate: agent_main
   vs seek_predictor_agent [HIDE] LOSE       6 steps
   vs trap_agent         [SEEK] WIN        8 steps
   vs trap_agent         [HIDE] LOSE      93 steps
-  Summary: wins=17, losses=15, win_rate=53.1%, avg_seek=7.5, avg_hide=66.2, tie=58.7
+  Summary: wins=17, losses=15, win_rate=53.1%, avg_seek=7.7, avg_hide=67.0, tie=59.3
 
 Ranking:
-1. agent_main         win_rate= 53.1% wins=17/32 avg_seek=  7.5 avg_hide= 66.2 tie=  58.7
+1. agent_main         win_rate= 53.1% wins=17/32 avg_seek=  7.7 avg_hide= 67.0 tie=  59.3
