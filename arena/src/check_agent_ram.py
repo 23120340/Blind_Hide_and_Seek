@@ -26,6 +26,14 @@ RESULTS_DIR = ROOT / "results"
 RAM_LIMIT_MB = 100.0
 
 
+def cleanup_old_result_files(prefix: str, keep_paths: set[Path]) -> None:
+    keep_resolved = {path.resolve() for path in keep_paths}
+    for suffix in ("txt", "json"):
+        for path in RESULTS_DIR.glob(f"{prefix}_*.{suffix}"):
+            if path.resolve() not in keep_resolved:
+                path.unlink()
+
+
 def rss_mb() -> float:
     """Return current process working-set/RSS in MB without external deps."""
     if sys.platform == "win32":
@@ -277,6 +285,7 @@ def run_parent(args: argparse.Namespace) -> int:
     txt = "\n".join(lines) + "\n"
     txt_path.write_text(txt, encoding="utf-8")
     latest_txt.write_text(txt, encoding="utf-8")
+    cleanup_old_result_files("agent_ram_check", {txt_path, json_path})
     print(txt)
     print(f"Saved: {txt_path}")
     print(f"Saved: {json_path}")

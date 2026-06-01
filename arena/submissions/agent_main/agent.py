@@ -33,6 +33,16 @@ MOVES = [Move.UP, Move.DOWN, Move.LEFT, Move.RIGHT]
 MOVES_STAY = [Move.UP, Move.DOWN, Move.LEFT, Move.RIGHT, Move.STAY]
 DEFAULT_PACMAN_START = (15, 10)
 DEFAULT_GHOST_START = (9, 10)
+DEFAULT_PACMAN_PATROL = [
+    (5, 12),
+    (1, 19),
+    (1, 1),
+    (5, 5),
+    (15, 5),
+    (19, 1),
+    (19, 19),
+    (15, 15),
+]
 DEFAULT_LAYOUT = [
     "#####################",
     "#.........#.........#",
@@ -315,13 +325,27 @@ class PacmanAgent(BasePacmanAgent, ArenaTools):
         super().__init__(**kwargs)
         self.name = "Agent Main Trap Seeker"
         self.pacman_speed = max(1, int(kwargs.get("pacman_speed", 1)))
+        self.seen_enemy_once = False
+        self.patrol_index = 0
+        self.seen_tiles = set()
+        self.sweep_state = 0
+        self.sweep_steps = 0
         self._init_memory()
 
     def step(self, map_state, my_position, enemy_position, step_number):
-        self._observe(map_state, my_position, enemy_position)
+        self._observe(map_state, my_position, enemy_position, DEFAULT_GHOST_START)
+        for r, c in np.argwhere(map_state == 0):
+            self.seen_tiles.add((int(r), int(c)))
+        self.seen_tiles.add(my_position)
 
         if enemy_position is not None:
+            self.seen_enemy_once = True
             target = self._trap_target(enemy_position)
+        elif self.fixed_map_mode and not self.seen_enemy_once:
+            path = self._sweep_path(my_position)
+            if path:
+                return self._path_action(my_position, path, map_state)
+            target = self._patrol_target(my_position)
         else:
             target = self._search_target(my_position)
 
@@ -331,6 +355,83 @@ class PacmanAgent(BasePacmanAgent, ArenaTools):
                 return self._path_action(my_position, path, map_state)
 
         return self._fallback(my_position, map_state)
+
+    def _patrol_target(self, start):
+        self.last_enemy = None
+        if not DEFAULT_PACMAN_PATROL:
+            return None
+        if start == DEFAULT_PACMAN_PATROL[self.patrol_index]:
+            self.patrol_index = (self.patrol_index + 1) % len(DEFAULT_PACMAN_PATROL)
+        return DEFAULT_PACMAN_PATROL[self.patrol_index]
+
+    def _sweep_path(self, start):
+        self.last_enemy = None
+        open_tiles = {tuple(pt) for pt in np.argwhere(self.known == 0)}
+        unseen = open_tiles - self.seen_tiles
+        if not unseen:
+            self.seen_tiles = {start}
+            self.sweep_state = 0
+            self.sweep_steps = 0
+            unseen = open_tiles - self.seen_tiles
+        if not unseen:
+            return []
+
+        height, width = self.known.shape
+        mid_r, mid_c = height // 2, width // 2
+
+        def region(pos):
+            r, c = pos
+            if r < mid_r and c >= mid_c:
+                return 0
+            if r < mid_r and c < mid_c:
+                return 1
+            if r >= mid_r and c < mid_c:
+                return 2
+            return 3
+
+        groups = [
+            {pos for pos in unseen if region(pos) == 0},
+            {pos for pos in unseen if region(pos) == 1},
+            {pos for pos in unseen if region(pos) == 2},
+            {pos for pos in unseen if region(pos) in (2, 3)},
+            unseen,
+        ]
+        orders = [
+            [Move.RIGHT, Move.UP, Move.DOWN, Move.LEFT],
+            [Move.LEFT, Move.UP, Move.DOWN, Move.RIGHT],
+            [Move.LEFT, Move.DOWN, Move.UP, Move.RIGHT],
+            [Move.DOWN, Move.RIGHT, Move.LEFT, Move.UP],
+            [Move.RIGHT, Move.UP, Move.LEFT, Move.DOWN],
+        ]
+
+        for _ in range(len(groups) + 1):
+            idx = min(self.sweep_state, len(groups) - 1)
+            if groups[idx] and not (idx == 0 and self.sweep_steps >= 3):
+                path = self._bfs_path_to_any(start, groups[idx], self.known, orders[idx])
+                if path:
+                    self.sweep_steps += 1
+                    return path
+            self.sweep_state = (self.sweep_state + 1) % len(groups)
+            self.sweep_steps = 0
+        return self._bfs_path_to_any(start, unseen, self.known, MOVES)
+
+    def _bfs_path_to_any(self, start, goals, grid, move_order):
+        if start in goals:
+            return []
+        queue = deque([(start, [])])
+        seen = {start}
+        while queue:
+            pos, path = queue.popleft()
+            for move in move_order:
+                nxt = self._move(pos, move)
+                if nxt in seen or not self._open(nxt, grid):
+                    continue
+                next_path = path + [move]
+                if nxt in goals:
+                    return next_path
+                seen.add(nxt)
+                queue.append((nxt, next_path))
+        return []
 
     def _trap_target(self, enemy):
         options = [enemy] + [pos for pos, _ in self._neighbors(enemy, self.known)]
@@ -390,84 +491,153 @@ class PacmanAgent(BasePacmanAgent, ArenaTools):
 
 
 class GhostAgent(BaseGhostAgent, ArenaTools):
+    PANIC_TURNS = 6
+    CAUTION_TURNS = 12
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.name = "Agent Main Escape Hider"
+        self.name = "Agent Main Belief Hider"
         self._init_memory()
+        self.belief = None
+        self.last_move = None
+        self.haven = None
+        self.last_enemy_step = -999
         self.fixed_opening = [
             Move.RIGHT,
-            Move.RIGHT,
+            Move.UP,
             Move.RIGHT,
             Move.UP,
-            Move.UP,
-            Move.LEFT,
         ]
 
     def step(self, map_state, my_position, enemy_position, step_number):
         self._observe(map_state, my_position, enemy_position, DEFAULT_PACMAN_START)
-        threat = enemy_position or self.last_enemy
-
-        if self.fixed_map_mode and step_number <= len(self.fixed_opening):
+        if enemy_position is not None:
+            self.last_enemy_step = step_number
+            move = self._visible_flee(my_position, enemy_position, map_state)
+        elif step_number <= len(self.fixed_opening):
             opening_move = self.fixed_opening[step_number - 1]
-            opening_pos = self._move(my_position, opening_move)
-            if self._open(opening_pos, map_state):
-                return opening_move
+            if opening_move == Move.STAY or self._open(self._move(my_position, opening_move), map_state):
+                move = opening_move
+            else:
+                move = self._move_toward_haven(my_position, map_state)
+        elif self.last_enemy is not None and step_number - self.last_enemy_step <= 5:
+            threat = self._advance_toward(self.last_enemy, my_position, 2)
+            move = self._visible_flee(my_position, threat, map_state)
+        else:
+            move = self._move_toward_haven(my_position, map_state)
 
-        # Refresh articulation cache (cheap when the known-map is unchanged).
-        self._compute_articulation()
+        self.last_move = move
+        return move
 
+    def _move_toward_haven(self, my_position, grid):
+        target = (grid.shape[0] - 2, grid.shape[1] - 2)
         best_move = Move.STAY
         best_score = -10**18
-        for nxt, move in self._neighbors(my_position, map_state, stay=True):
-            score = self._escape_score(nxt, move, threat)
+        for pos, move in self._neighbors(my_position, grid, stay=True):
+            dist = self._manhattan(pos, target)
+            exits = len(self._neighbors(pos, self.known))
+            score = -dist * 4 + exits * 1.5 - self.visits.get(pos, 0)
+            if move == Move.STAY:
+                score -= 2
+            if self.last_move is not None and move.value == (-self.last_move.value[0], -self.last_move.value[1]):
+                score -= 1
             if score > best_score:
                 best_score = score
                 best_move = move
         return best_move
 
-    def _escape_score(self, pos, move, threat):
-        exits = len(self._neighbors(pos, self.known))
-        potential = self._escape_potential(pos, threat)
-        cycle = self._biconn_size.get(pos, 0) if self._biconn_size else 0
-        is_art = self._art_points and pos in self._art_points
+    def _visible_flee(self, my_position, enemy_position, grid):
+        best_move = Move.STAY
+        best_score = -10**18
+        pac_reach = self._pacman_reachable_positions(enemy_position)
+        for pos, move in self._neighbors(my_position, grid, stay=True):
+            direct = min(self._manhattan(pos, pac_pos) for pac_pos in pac_reach)
+            maze = min(self._maze_distance(pos, pac_pos, self.known, max_depth=35) for pac_pos in pac_reach)
+            exits = len(self._neighbors(pos, self.known))
+            score = direct * 20 + maze * 3 + exits * 2 - self.visits.get(pos, 0)
 
-        score = exits * 10
-        score += potential * 2.5
-        score += cycle * 0.8                          # bigger cycle = safer to loop
-        score += self._unknown_adjacent(pos) * 1.5
-        score -= self.visits.get(pos, 0) * 2.5
+            same_row = pos[0] == enemy_position[0]
+            same_col = pos[1] == enemy_position[1]
+            if not same_row and not same_col:
+                score += 90
+            elif same_row or same_col:
+                score -= 45
 
-        if is_art:
-            score -= 35                               # articulation = chokepoint
-        if pos in list(self.recent)[-4:]:
-            score -= 8
-        if exits <= 1:
-            score -= 85
-        elif exits == 2 and self._corridor_without_junction(pos):
-            score -= 22
-        if move == Move.STAY:
-            score -= 12
+            line_risk = 0
+            for pac_pos in pac_reach:
+                if (pos[0] == pac_pos[0] or pos[1] == pac_pos[1]) and self._manhattan(pos, pac_pos) <= 5:
+                    line_risk += 1
+            score -= line_risk * 420
 
-        if threat is not None:
-            pacman_reach = self._pacman_reachable_positions(threat)
-            min_direct = min(self._manhattan(pos, pac_pos) for pac_pos in pacman_reach)
-            min_maze = min(self._maze_distance(pos, pac_pos, self.known, max_depth=32) for pac_pos in pacman_reach)
+            if my_position[0] == enemy_position[0] and move.value[0] != 0:
+                score += 120
+            if my_position[1] == enemy_position[1] and move.value[1] != 0:
+                score += 120
 
-            score += min(self._maze_distance(pos, threat, self.known, max_depth=35), 35) * 4.5
-            score += min(min_maze, 32) * 5
-            score += min_direct * 8
+            if direct < 2:
+                score -= 1000
+            elif direct < 4:
+                score -= 120
+            if move == Move.STAY:
+                score -= 5
+            if score > best_score:
+                best_score = score
+                best_move = move
+        return best_move
 
-            # Voronoi-style bonus: more ghost-first territory = more room.
-            if min_direct >= 2:
-                ghost_terr = self._voronoi_terr(threat, pos, pacman_speed=2)
-                score += ghost_terr * 0.4
+    def _update_pacman_belief(self, map_state, my_position, enemy_position, step_number):
+        if self.belief is None or self.belief.shape != self.known.shape:
+            self.belief = np.zeros(self.known.shape, dtype=np.float32)
+            passable = self.known != 1
+            self.belief[passable] = 1.0
+            total = float(self.belief.sum())
+            if total > 0:
+                self.belief /= total
 
-            if min_direct < 2:
-                score -= 700
-            elif min_direct < 4:
-                score -= 90
+        if step_number > 1:
+            new_belief = np.zeros_like(self.belief)
+            for r, c in np.argwhere(self.belief > 1e-9):
+                pos = (int(r), int(c))
+                reachable = self._pacman_reachable_positions(pos)
+                share = self.belief[pos] / max(1, len(reachable))
+                for nxt in reachable:
+                    new_belief[nxt] += share
+            self.belief = new_belief
 
-        return score
+        if enemy_position is not None:
+            self.belief[:] = 0.0
+            self.belief[enemy_position] = 1.0
+            self.haven = None
+        else:
+            visible_empty = map_state == 0
+            self.belief[visible_empty] = 0.0
+            self.belief[my_position] = 0.0
+
+        total = float(self.belief.sum())
+        if total > 0:
+            self.belief /= total
+        else:
+            passable = self.known != 1
+            self.belief[passable] = 1.0
+            self.belief[my_position] = 0.0
+            total = float(self.belief.sum())
+            if total > 0:
+                self.belief /= total
+
+    def _belief_centroid(self):
+        if self.belief is None:
+            return self.last_enemy
+        total = float(self.belief.sum())
+        if total <= 1e-12:
+            return self.last_enemy
+        rows, cols = np.indices(self.belief.shape)
+        r = int(round(float((rows * self.belief).sum() / total)))
+        c = int(round(float((cols * self.belief).sum() / total)))
+        r = max(0, min(self.belief.shape[0] - 1, r))
+        c = max(0, min(self.belief.shape[1] - 1, c))
+        if self._open((r, c), self.known):
+            return (r, c)
+        return self.last_enemy
 
     def _pacman_reachable_positions(self, pacman_pos):
         positions = [pacman_pos]
@@ -481,28 +651,95 @@ class GhostAgent(BaseGhostAgent, ArenaTools):
                 cur = nxt
         return positions
 
-    def _escape_potential(self, start, threat):
-        distances = self._distance_map(start, self.known, max_depth=7)
-        best = 0
+    def _pacman_turn_distances(self, origin):
+        queue = deque([origin])
+        dist = {origin: 0}
+        while queue:
+            pos = queue.popleft()
+            for nxt in self._pacman_reachable_positions(pos):
+                if nxt not in dist:
+                    dist[nxt] = dist[pos] + 1
+                    queue.append(nxt)
+        return dist
+
+    def _panic_move(self, my_position, turn_dist):
+        pac_nexts = [pos for pos, dist in turn_dist.items() if dist <= 1]
+        best_move = Move.STAY
+        best_score = -10**18
+        for pos, move in self._neighbors(my_position, self.known, stay=True):
+            worst = 999
+            for pac_pos in pac_nexts:
+                if self._manhattan(pos, pac_pos) < 2:
+                    worst = -100
+                    break
+                pac2 = self._pacman_reachable_positions(pac_pos)
+                g2_positions = [pos] + [nxt for nxt, _ in self._neighbors(pos, self.known)]
+                reply = max(min(self._manhattan(g2, p2) for p2 in pac2) for g2 in g2_positions)
+                worst = min(worst, reply)
+            exits = len(self._neighbors(pos, self.known))
+            score = worst * 12 + turn_dist.get(pos, 0) * 2 + exits * 1.5
+            score -= self.visits.get(pos, 0) * 0.8
+            if self.last_move is not None and move.value == (-self.last_move.value[0], -self.last_move.value[1]):
+                score -= 2.0
+            if move == Move.STAY:
+                score -= 0.5
+            if exits <= 1:
+                score -= 5.0
+            if score > best_score:
+                best_score = score
+                best_move = move
+        return best_move
+
+    def _caution_move(self, my_position, turn_dist):
+        best_move = Move.STAY
+        best_score = -10**18
+        for pos, move in self._neighbors(my_position, self.known, stay=True):
+            exits = len(self._neighbors(pos, self.known))
+            score = turn_dist.get(pos, 0) * 2.8 + exits * 1.4
+            score -= self.visits.get(pos, 0) * 0.7
+            if self.last_move is not None and move.value == (-self.last_move.value[0], -self.last_move.value[1]):
+                score -= 1.5
+            if move == Move.STAY:
+                score -= 0.5
+            if exits <= 1:
+                score -= 5.0
+            if score > best_score:
+                best_score = score
+                best_move = move
+        return best_move
+
+    def _calm_move(self, my_position, turn_dist):
+        if self.haven is None or self.haven == my_position:
+            self.haven = self._find_haven(my_position, turn_dist)
+        if self.haven is not None and self.haven != my_position:
+            path = self._bfs_path(my_position, self.haven, self.known)
+            if path:
+                return path[0]
+        return self._caution_move(my_position, turn_dist)
+
+    def _find_haven(self, my_position, turn_dist):
+        distances = self._distance_map(my_position, self.known, max_depth=80)
+        best = None
+        best_score = -10**18
         for pos, dist in distances.items():
             exits = len(self._neighbors(pos, self.known))
-            score = exits * 3 - dist * 0.5 - self.visits.get(pos, 0)
-            if threat is not None:
-                score += min(self._maze_distance(pos, threat, self.known, max_depth=25), 25)
-            best = max(best, score)
+            if exits < 2:
+                continue
+            score = turn_dist.get(pos, 0) * 3.0 + exits - dist * 0.25
+            score -= self.visits.get(pos, 0) * 0.8
+            if score > best_score:
+                best_score = score
+                best = pos
         return best
 
-    def _corridor_without_junction(self, start):
-        queue = deque([(start, 0)])
-        seen = {start}
-        while queue:
-            pos, dist = queue.popleft()
-            if dist > 5:
-                continue
-            if len(self._neighbors(pos, self.known)) >= 3:
-                return False
-            for nxt, _ in self._neighbors(pos, self.known):
-                if nxt not in seen:
-                    seen.add(nxt)
-                    queue.append((nxt, dist + 1))
-        return True
+    def _wander(self, my_position, grid):
+        best_move = Move.STAY
+        best_score = -10**18
+        for pos, move in self._neighbors(my_position, grid, stay=True):
+            score = len(self._neighbors(pos, self.known)) * 2 - self.visits.get(pos, 0)
+            if move == Move.STAY:
+                score -= 1
+            if score > best_score:
+                best_score = score
+                best_move = move
+        return best_move

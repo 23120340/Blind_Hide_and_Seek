@@ -44,6 +44,12 @@ class Match:
     raw: str
 
 
+def cleanup_old_result_files(prefix: str, keep_path: Path) -> None:
+    for path in RESULTS_DIR.glob(f"{prefix}_*.txt"):
+        if path.resolve() != keep_path.resolve():
+            path.unlink()
+
+
 def strip_ansi(text: str) -> str:
     return re.sub(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])", "", text)
 
@@ -309,6 +315,7 @@ def main() -> int:
 
     result_path.write_text("\n".join(blocks) + "\n", encoding="utf-8")
     (RESULTS_DIR / "latest_results.txt").write_text("\n".join(blocks) + "\n", encoding="utf-8")
+    cleanup_old_result_files("tournament", result_path)
     print(f"\nSaved: {result_path}")
     return 0
 

@@ -43,6 +43,12 @@ class RoleStats:
         return sum(self.steps) / len(self.steps) if self.steps else 0.0
 
 
+def cleanup_old_result_files(prefix, keep_path):
+    for path in RESULTS_DIR.glob(f"{prefix}_*.txt"):
+        if path.resolve() != keep_path.resolve():
+            path.unlink()
+
+
 def discover_valid_agents(loader):
     valid = []
     invalid = []
@@ -214,6 +220,7 @@ def main():
     result_path = RESULTS_DIR / f"role_tournament_{now}.txt"
     result_path.write_text(output, encoding="utf-8")
     (RESULTS_DIR / "latest_role_results.txt").write_text(output, encoding="utf-8")
+    cleanup_old_result_files("role_tournament", result_path)
     print(output)
     print(f"Saved: {result_path}")
 
