@@ -241,10 +241,26 @@ def evaluate_candidate(args, candidate: str, opponents: list[str]) -> tuple[dict
     return summary, "\n".join(lines)
 
 
+def format_ranking(summaries: list[dict]) -> str:
+    ordered = sorted(summaries, key=lambda item: item["rank_score"], reverse=True)
+    ranking_lines = ["\nRanking:"]
+    for idx, item in enumerate(ordered, start=1):
+        ranking_lines.append(
+            f"{idx}. {item['candidate']:<18} "
+            f"win_rate={item['win_rate']:>5.1f}% "
+            f"wins={item['wins']:>2}/{item['wins'] + item['losses']:<2} "
+            f"avg_seek={item['avg_seek']:>5.1f} "
+            f"avg_hide={item['avg_hide']:>5.1f} "
+            f"tie={item['tie_score']:>6.1f}"
+        )
+    return "\n".join(ranking_lines)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Compare Pacman/Ghost agents.")
     parser.add_argument("--main", default="codex_agent", help="Single candidate to evaluate.")
     parser.add_argument("--candidates", nargs="*", help="Evaluate multiple candidates.")
+    parser.add_argument("--all-candidates", action="store_true", help="Evaluate every discovered non-risky agent.")
     parser.add_argument("--opponents", nargs="*", help="Opponent agent names. Default: all discovered agents.")
     parser.add_argument("--max-steps", type=int, default=200)
     parser.add_argument("--step-timeout", type=float, default=1.0)
@@ -271,7 +287,10 @@ def main() -> int:
         ]
         discovered.sort()
 
-    candidates = args.candidates if args.candidates else [args.main]
+    if args.all_candidates:
+        candidates = discovered
+    else:
+        candidates = args.candidates if args.candidates else [args.main]
     opponents = args.opponents if args.opponents else discovered
 
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -296,20 +315,12 @@ def main() -> int:
         summaries.append(summary)
         blocks.append(block)
         print(block)
+        partial_ranking = format_ranking(summaries)
+        result_text = "\n".join(blocks + [partial_ranking]) + "\n"
+        result_path.write_text(result_text, encoding="utf-8")
+        (RESULTS_DIR / "latest_results.txt").write_text(result_text, encoding="utf-8")
 
-    summaries.sort(key=lambda item: item["rank_score"], reverse=True)
-    ranking_lines = ["\nRanking:"]
-    for idx, item in enumerate(summaries, start=1):
-        ranking_lines.append(
-            f"{idx}. {item['candidate']:<18} "
-            f"win_rate={item['win_rate']:>5.1f}% "
-            f"wins={item['wins']:>2}/{item['wins'] + item['losses']:<2} "
-            f"avg_seek={item['avg_seek']:>5.1f} "
-            f"avg_hide={item['avg_hide']:>5.1f} "
-            f"tie={item['tie_score']:>6.1f}"
-        )
-
-    ranking = "\n".join(ranking_lines)
+    ranking = format_ranking(summaries)
     print(ranking)
     blocks.append(ranking)
 
