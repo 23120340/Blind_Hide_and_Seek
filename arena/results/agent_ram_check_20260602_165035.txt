@@ -1,7 +1,7 @@
 Blind Hide and Seek Agent RAM Check
-Time: 20260602_154651
+Time: 20260602_165035
 RAM limit: total_delta <= 100MB
 Warmup: up to 80 self-play steps per agent
 
 agent                 status       total_delta  agent_delta  peak_mb  steps  verdict
-agent_main            ok                 10.7         0.6     30.7    12  PASS
+agent_main            ok                 10.4         0.5     30.5    12  PASS
