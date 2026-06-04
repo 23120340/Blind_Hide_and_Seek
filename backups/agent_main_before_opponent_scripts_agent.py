@@ -80,56 +80,6 @@ def _default_map():
 
 DEFAULT_MAP = _default_map()
 
-# One coverage-aware blind patrol is used against every seeker. Each entry is
-# (target cell, last step to hold there); visible Pacman observations always
-# interrupt the patrol and switch to the normal evasion policy.
-BLIND_PATROL_SCHEDULE = [
-    ((9, 15), 5),
-    ((3, 15), 11),
-    ((3, 16), 14),
-    ((3, 19), 17),
-    ((2, 19), 32),
-    ((1, 19), 33),
-    ((1, 15), 37),
-    ((3, 15), 39),
-    ((3, 13), 41),
-    ((4, 13), 47),
-    ((5, 13), 48),
-    ((5, 11), 50),
-    ((7, 11), 52),
-    ((7, 13), 54),
-    ((8, 13), 56),
-    ((7, 13), 57),
-    ((7, 12), 68),
-    ((7, 11), 69),
-    ((5, 11), 71),
-    ((5, 12), 73),
-    ((5, 13), 74),
-    ((3, 13), 76),
-    ((3, 9), 80),
-    ((1, 9), 82),
-    ((1, 8), 83),
-    ((1, 9), 84),
-    ((3, 9), 86),
-    ((3, 7), 88),
-    ((4, 7), 95),
-    ((5, 7), 96),
-    ((5, 9), 98),
-    ((7, 9), 100),
-    ((7, 11), 102),
-    ((6, 11), 133),
-    ((5, 11), 134),
-    ((5, 13), 136),
-    ((3, 13), 138),
-    ((3, 12), 146),
-    ((3, 11), 147),
-    ((2, 11), 155),
-    ((1, 11), 156),
-    ((1, 12), 164),
-    ((1, 15), 167),
-    ((1, 11), 200),
-]
-
 
 class ArenaTools:
     def _init_memory(self):
@@ -564,7 +514,6 @@ class GhostAgent(BaseGhostAgent):
         self.enemy_trace = deque(maxlen=5)
         self.approach_read = 0
         self.lane_read = 0
-        self.blind_patrol_index = 0
 
     def step(self, map_state, my_position, enemy_position, step_number):
         deadline = time.perf_counter() + self.THINK_BUDGET
@@ -580,12 +529,6 @@ class GhostAgent(BaseGhostAgent):
 
         if self.pacman_memory is None:
             self.pacman_memory = DEFAULT_PACMAN_START
-
-        if enemy_position is None:
-            move = self._blind_patrol_move(my_position, step_number, deadline)
-            if move is not None:
-                self._remember(my_position, move)
-                return move
 
         if self.reaching_guard:
             if my_position == self.guard_cell:
@@ -629,19 +572,6 @@ class GhostAgent(BaseGhostAgent):
 
         self._remember(my_position, move)
         return move
-
-    def _blind_patrol_move(self, my_position, step_number, deadline):
-        while self.blind_patrol_index < len(BLIND_PATROL_SCHEDULE):
-            target, hold_until = BLIND_PATROL_SCHEDULE[self.blind_patrol_index]
-            if my_position == target:
-                if step_number <= hold_until:
-                    return Move.STAY
-                self.blind_patrol_index += 1
-                continue
-
-            path = self._bfs_path(my_position, target, self.BOARD, deadline)
-            return path[0] if path else Move.STAY
-        return None
 
     def _remember(self, pos, move):
         if move != Move.STAY:
