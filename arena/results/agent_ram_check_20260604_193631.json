@@ -1,5 +1,5 @@
 {
-  "time": "20260604_171850",
+  "time": "20260604_193631",
   "ram_limit_mb": 100.0,
   "max_steps": 200,
   "timeout_s": 360.0,
@@ -9,15 +9,15 @@
       "status": "ok",
       "error": "",
       "steps_done": 16,
-      "base_mb": 19.65234375,
-      "framework_mb": 29.71484375,
-      "loaded_mb": 30.05078125,
-      "peak_mb": 30.33984375,
-      "total_delta_mb": 10.6875,
-      "agent_delta_mb": 0.625,
+      "base_mb": 20.0625,
+      "framework_mb": 30.03515625,
+      "loaded_mb": 30.42578125,
+      "peak_mb": 30.73828125,
+      "total_delta_mb": 10.67578125,
+      "agent_delta_mb": 0.703125,
       "pass_total_100mb": true,
       "pass_agent_100mb": true,
-      "elapsed_s": 0.15484710002783686,
+      "elapsed_s": 0.1791738000465557,
       "returncode": 0
     }
   ]

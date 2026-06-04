@@ -9,7 +9,6 @@ Seeker strategy:
 Hider strategy:
   - follow one opponent-agnostic 200-step patrol optimized for blind survival,
   - immediately interrupt the patrol whenever the seeker becomes visible,
-  - track all plausible speed-2 seeker positions after first contact,
   - estimate recent seeker motion and prefer distance, broken line of sight,
     junction mobility, and non-repeating escape moves.
 
@@ -756,22 +755,9 @@ class GhostAgent(BaseGhostAgent):
         self.approach_read = 0
         self.lane_read = 0
         self.blind_patrol_index = 0
-        self.tactical_belief = None
 
     def step(self, map_state, my_position, enemy_position, step_number):
         deadline = time.perf_counter() + self.THINK_BUDGET
-
-        if enemy_position is not None:
-            self.tactical_belief = {enemy_position}
-        elif self.tactical_belief is not None:
-            self.tactical_belief = self._advance_tactical_belief(self.tactical_belief)
-            self.tactical_belief.difference_update(self._visible_from_cell(my_position))
-
-        if self.tactical_belief:
-            predicted = self._advance_tactical_belief(self.tactical_belief)
-            move = self._pick_tactical_move(my_position, predicted)
-            self._remember(my_position, move)
-            return move
 
         if enemy_position is not None:
             self._read_enemy_motion(enemy_position, my_position)
@@ -850,58 +836,6 @@ class GhostAgent(BaseGhostAgent):
     def _remember(self, pos, move):
         if move != Move.STAY:
             self.recent_cells.append((pos[0] + move.value[0], pos[1] + move.value[1]))
-
-    def _advance_tactical_belief(self, positions):
-        predicted = set()
-        for pos in positions:
-            predicted.add(pos)
-            for move in MOVES:
-                current = pos
-                for _ in range(2):
-                    nxt = (current[0] + move.value[0], current[1] + move.value[1])
-                    if self.BOARD[nxt] == 1:
-                        break
-                    current = nxt
-                    predicted.add(current)
-        return predicted
-
-    def _visible_from_cell(self, pos):
-        visible = {pos}
-        for move in MOVES:
-            for distance in range(1, 6):
-                nxt = (
-                    pos[0] + move.value[0] * distance,
-                    pos[1] + move.value[1] * distance,
-                )
-                if self.BOARD[nxt] == 1:
-                    break
-                visible.add(nxt)
-        return visible
-
-    def _pick_tactical_move(self, my_position, predicted):
-        candidates = [my_position] + self._walkable_neighbors(my_position, self.BOARD)
-        best_position = my_position
-        best_score = None
-        for position in candidates:
-            distances = [
-                abs(position[0] - pacman[0]) + abs(position[1] - pacman[1])
-                for pacman in predicted
-            ]
-            capture_risk = sum(distance < 2 for distance in distances)
-            visible_risk = sum(position in self._visible_from_cell(pacman) for pacman in predicted)
-            exits = len(self._walkable_neighbors(position, self.BOARD))
-            score = (
-                -capture_risk,
-                -visible_risk,
-                min(distances),
-                sum(distances),
-                exits,
-                -self.recent_cells.count(position),
-            )
-            if best_score is None or score > best_score:
-                best_score = score
-                best_position = position
-        return self._delta_to_move(my_position, best_position)
 
     def _read_enemy_motion(self, enemy_pos, my_pos):
         if self.enemy_trace:

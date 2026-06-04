@@ -1,5 +1,5 @@
 Blind Hide and Seek Tournament
-Time: 20260604_171506
+Time: 20260604_193645
 Mode: candidate
 Candidates: agent_main
 Opponents: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
@@ -10,11 +10,11 @@ Settings: max_steps=200, speed=2, capture=2, obs=(5, 5), start=deterministic, wo
 Candidate: agent_main
   vs 1                  [SEEK] WIN        5 steps
   vs 1                  [HIDE] WIN      200 steps
-  vs 2                  [SEEK] WIN       10 steps
+  vs 2                  [SEEK] WIN        8 steps
   vs 2                  [HIDE] WIN      200 steps
   vs 3                  [SEEK] WIN        6 steps
   vs 3                  [HIDE] WIN      200 steps
-  vs 4                  [SEEK] WIN        6 steps
+  vs 4                  [SEEK] WIN       11 steps
   vs 4                  [HIDE] WIN      200 steps
   vs 5                  [SEEK] WIN        6 steps
   vs 5                  [HIDE] WIN      200 steps
@@ -29,20 +29,20 @@ Candidate: agent_main
   vs 11                 [SEEK] WIN        6 steps
   vs 11                 [HIDE] WIN      200 steps
   vs 12                 [SEEK] WIN       26 steps
-  vs 12                 [HIDE] LOSE       5 steps
+  vs 12                 [HIDE] LOSE       6 steps
   vs 13                 [SEEK] WIN        9 steps
   vs 13                 [HIDE] WIN      200 steps
   vs 14                 [SEEK] WIN       10 steps
-  vs 14                 [HIDE] LOSE       5 steps
+  vs 14                 [HIDE] LOSE       8 steps
   vs 15                 [SEEK] WIN       10 steps
   vs 15                 [HIDE] LOSE      16 steps
-  vs 16                 [SEEK] WIN        6 steps
+  vs 16                 [SEEK] WIN       16 steps
   vs 16                 [HIDE] WIN      200 steps
   vs 17                 [SEEK] WIN       14 steps
   vs 17                 [HIDE] WIN      200 steps
   vs 18                 [SEEK] WIN        6 steps
   vs 18                 [HIDE] WIN      200 steps
-  Summary: wins=31, losses=3, win_rate=91.2%, avg_seek=9.4, avg_hide=166.2, tie=156.8
+  Summary: wins=31, losses=3, win_rate=91.2%, avg_seek=10.2, avg_hide=166.5, tie=156.3
 
 Ranking:
-1. agent_main         win_rate= 91.2% wins=31/34 avg_seek=  9.4 avg_hide=166.2 tie= 156.8
+1. agent_main         win_rate= 91.2% wins=31/34 avg_seek= 10.2 avg_hide=166.5 tie= 156.3
