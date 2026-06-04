@@ -664,7 +664,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--max-steps", type=int, default=200)
     parser.add_argument("--step-timeout", type=float, default=1.0)
-    parser.add_argument("--process-timeout", type=float, default=120.0)
+    parser.add_argument(
+        "--process-timeout",
+        type=float,
+        default=300.0,
+        help="Maximum wall-clock seconds per match; 300 allows slow 200-step agents to finish.",
+    )
     parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS, help="Parallel arena subprocesses to run.")
     parser.add_argument(
         "--cache-detail",

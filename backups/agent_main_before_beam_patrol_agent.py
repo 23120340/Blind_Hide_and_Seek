@@ -1,19 +1,18 @@
-"""Combined seeker and hider optimized for the default Blind Hide and Seek map.
+"""
+Primary role-combined tournament agent.
 
-Seeker strategy:
-  - reconstruct the fixed map from the always-visible walls,
-  - run a coverage-oriented opening sweep while the hider is unseen,
-  - use full speed along straight path segments,
-  - pursue the visible hider directly, then search its last known area.
+Pacman uses trap-aware pursuit: when the Ghost is visible, it targets cells
+that reduce the Ghost's escape options; otherwise it searches frontier cells.
 
-Hider strategy:
-  - follow one opponent-agnostic 200-step patrol optimized for blind survival,
-  - immediately interrupt the patrol whenever the seeker becomes visible,
-  - estimate recent seeker motion and prefer distance, broken line of sight,
-    junction mobility, and non-repeating escape moves.
+Ghost uses a fixed-map opening and a blended safety evaluator combining four
+signals:
+  - direct Pacman reachability and worst-case lunge distance,
+  - maze distance and a 7-step escape-potential lookahead,
+  - cycle awareness via articulation points and biconnected component size,
+  - Voronoi territory: cells the Ghost reaches before a speed-aware Pacman.
 
-The same logic is used against every opponent; the agent never reads or
-branches on opponent identity.
+The articulation-point analysis is computed lazily and cached across turns,
+so the per-step cost stays well within the time limit.
 """
 
 import sys
@@ -81,243 +80,54 @@ def _default_map():
 
 DEFAULT_MAP = _default_map()
 
-# One coverage-aware blind patrol is used against every seeker. It was found
-# by maximizing survival against an ensemble of unseen-search trajectories,
-# without branching on opponent identity. Visible Pacman observations always
+# One coverage-aware blind patrol is used against every seeker. Each entry is
+# (target cell, last step to hold there); visible Pacman observations always
 # interrupt the patrol and switch to the normal evasion policy.
-BLIND_PATROL_POSITIONS = [
-    (9, 11),
-    (9, 12),
-    (9, 13),
-    (9, 14),
-    (9, 15),
-    (8, 15),
-    (7, 15),
-    (6, 15),
-    (5, 15),
-    (4, 15),
-    (3, 15),
-    (3, 16),
-    (3, 17),
-    (3, 18),
-    (3, 19),
-    (3, 19),
-    (4, 19),
-    (5, 19),
-    (5, 19),
-    (5, 19),
-    (4, 19),
-    (5, 19),
-    (4, 19),
-    (5, 19),
-    (5, 19),
-    (4, 19),
-    (3, 19),
-    (2, 19),
-    (3, 19),
-    (3, 18),
-    (3, 17),
-    (3, 16),
-    (3, 15),
-    (3, 14),
-    (3, 13),
-    (4, 13),
-    (5, 13),
-    (5, 13),
-    (4, 13),
-    (5, 13),
-    (5, 12),
-    (5, 11),
-    (6, 11),
-    (7, 11),
-    (7, 10),
-    (7, 9),
-    (6, 9),
-    (5, 9),
-    (5, 8),
-    (5, 7),
-    (5, 7),
-    (5, 7),
-    (5, 8),
-    (5, 9),
-    (5, 8),
-    (5, 9),
-    (6, 9),
-    (7, 9),
-    (7, 8),
-    (7, 7),
-    (8, 7),
-    (9, 7),
-    (10, 7),
-    (11, 7),
-    (11, 8),
-    (11, 9),
-    (11, 8),
-    (11, 7),
-    (12, 7),
-    (13, 7),
-    (13, 6),
-    (13, 6),
-    (13, 5),
-    (13, 5),
-    (14, 5),
-    (15, 5),
-    (16, 5),
-    (17, 5),
-    (17, 4),
-    (17, 3),
-    (17, 2),
-    (17, 1),
-    (18, 1),
-    (19, 1),
-    (19, 2),
-    (19, 3),
-    (19, 4),
-    (19, 5),
-    (19, 6),
-    (19, 7),
-    (19, 8),
-    (19, 9),
-    (19, 10),
-    (19, 11),
-    (18, 11),
-    (17, 11),
-    (17, 12),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 12),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (16, 13),
-    (17, 13),
-    (17, 12),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 12),
-    (17, 13),
-    (17, 12),
-    (17, 13),
-    (17, 12),
-    (17, 13),
-    (17, 13),
-    (17, 13),
-    (17, 12),
-    (17, 11),
-    (18, 11),
-    (19, 11),
-    (19, 10),
-    (19, 9),
-    (19, 8),
-    (19, 7),
-    (19, 6),
-    (19, 5),
-    (19, 4),
-    (19, 3),
-    (19, 2),
-    (19, 1),
-    (19, 1),
-    (19, 1),
-    (19, 1),
-    (19, 1),
-    (19, 1),
-    (19, 1),
-    (19, 1),
-    (19, 1),
-    (18, 1),
-    (17, 1),
-    (17, 2),
-    (17, 3),
-    (17, 2),
-    (17, 3),
-    (17, 4),
-    (17, 5),
-    (16, 5),
-    (15, 5),
-    (16, 5),
-    (16, 5),
-    (17, 5),
-    (17, 5),
-    (17, 4),
-    (17, 3),
-    (16, 3),
-    (15, 3),
-    (15, 2),
-    (15, 1),
-    (15, 1),
-    (14, 1),
-    (13, 1),
-    (14, 1),
-    (14, 1),
-    (14, 1),
-    (15, 1),
-    (15, 1),
-    (15, 1),
-    (14, 1),
-    (13, 1),
-    (13, 1),
-    (13, 1),
-    (14, 1),
-    (13, 1),
-    (14, 1),
-    (13, 1),
-    (13, 1),
-    (14, 1),
-    (15, 1),
-    (15, 1),
-    (15, 1),
-    (15, 1),
-    (15, 1),
-    (14, 1),
-    (14, 1),
-    (13, 1),
-    (14, 1),
-    (13, 1),
-    (13, 1),
-]
-
-# A second ensemble pass keeps the proven opening, then moves the patrol into
-# a compact upper loop that remains unseen across a wider range of searches.
-# Encoding the tail as moves keeps the submitted strategy small while still
-# producing one fixed, opponent-agnostic route.
-_PATROL_DELTAS = {
-    "U": (-1, 0),
-    "D": (1, 0),
-    "L": (0, -1),
-    "R": (0, 1),
-    "S": (0, 0),
-}
-_ROBUST_PATROL_TAIL = (
-    "LUDSUUDDUDUDUUDULRLLUURRRRDSULLLRRRDDLLDSUDDRSRDDRSRUUDUDUDU"
-    "DUDUDUDUDUDURRUDUDLLDUDURRUULLUUDUDUDUDDUURRLLRLRRRSRRRRLRLL"
-    "LDULLRRDUDULSLLRLRRSLLRLLDUDUDU"
-)
-_patrol_cursor = BLIND_PATROL_POSITIONS[48]
-_robust_positions = []
-for _patrol_code in _ROBUST_PATROL_TAIL:
-    _patrol_delta = _PATROL_DELTAS[_patrol_code]
-    _patrol_cursor = (
-        _patrol_cursor[0] + _patrol_delta[0],
-        _patrol_cursor[1] + _patrol_delta[1],
-    )
-    _robust_positions.append(_patrol_cursor)
-BLIND_PATROL_POSITIONS[49:] = _robust_positions
-
 BLIND_PATROL_SCHEDULE = [
-    (position, step)
-    for step, position in enumerate(BLIND_PATROL_POSITIONS, 1)
+    ((9, 15), 5),
+    ((3, 15), 11),
+    ((3, 16), 14),
+    ((3, 19), 17),
+    ((2, 19), 32),
+    ((1, 19), 33),
+    ((1, 15), 37),
+    ((3, 15), 39),
+    ((3, 13), 41),
+    ((4, 13), 47),
+    ((5, 13), 48),
+    ((5, 11), 50),
+    ((7, 11), 52),
+    ((7, 13), 54),
+    ((8, 13), 56),
+    ((7, 13), 57),
+    ((7, 12), 68),
+    ((7, 11), 69),
+    ((5, 11), 71),
+    ((5, 12), 73),
+    ((5, 13), 74),
+    ((3, 13), 76),
+    ((3, 9), 80),
+    ((1, 9), 82),
+    ((1, 8), 83),
+    ((1, 9), 84),
+    ((3, 9), 86),
+    ((3, 7), 88),
+    ((4, 7), 95),
+    ((5, 7), 96),
+    ((5, 9), 98),
+    ((7, 9), 100),
+    ((7, 11), 102),
+    ((6, 11), 133),
+    ((5, 11), 134),
+    ((5, 13), 136),
+    ((3, 13), 138),
+    ((3, 12), 146),
+    ((3, 11), 147),
+    ((2, 11), 155),
+    ((1, 11), 156),
+    ((1, 12), 164),
+    ((1, 15), 167),
+    ((1, 11), 200),
 ]
 
 
@@ -582,7 +392,7 @@ class PacmanAgent(BasePacmanAgent, ArenaTools):
 
         if enemy_position is not None:
             self.seen_enemy_once = True
-            target = enemy_position
+            target = self._trap_target(enemy_position)
         elif self.fixed_map_mode and not self.seen_enemy_once:
             if step_number >= 16:
                 corner = (self.known.shape[0] - 2, self.known.shape[1] - 2)

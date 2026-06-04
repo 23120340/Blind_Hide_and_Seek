@@ -287,34 +287,6 @@ BLIND_PATROL_POSITIONS = [
     (13, 1),
     (13, 1),
 ]
-
-# A second ensemble pass keeps the proven opening, then moves the patrol into
-# a compact upper loop that remains unseen across a wider range of searches.
-# Encoding the tail as moves keeps the submitted strategy small while still
-# producing one fixed, opponent-agnostic route.
-_PATROL_DELTAS = {
-    "U": (-1, 0),
-    "D": (1, 0),
-    "L": (0, -1),
-    "R": (0, 1),
-    "S": (0, 0),
-}
-_ROBUST_PATROL_TAIL = (
-    "LUDSUUDDUDUDUUDULRLLUURRRRDSULLLRRRDDLLDSUDDRSRDDRSRUUDUDUDU"
-    "DUDUDUDUDUDURRUDUDLLDUDURRUULLUUDUDUDUDDUURRLLRLRRRSRRRRLRLL"
-    "LDULLRRDUDULSLLRLRRSLLRLLDUDUDU"
-)
-_patrol_cursor = BLIND_PATROL_POSITIONS[48]
-_robust_positions = []
-for _patrol_code in _ROBUST_PATROL_TAIL:
-    _patrol_delta = _PATROL_DELTAS[_patrol_code]
-    _patrol_cursor = (
-        _patrol_cursor[0] + _patrol_delta[0],
-        _patrol_cursor[1] + _patrol_delta[1],
-    )
-    _robust_positions.append(_patrol_cursor)
-BLIND_PATROL_POSITIONS[49:] = _robust_positions
-
 BLIND_PATROL_SCHEDULE = [
     (position, step)
     for step, position in enumerate(BLIND_PATROL_POSITIONS, 1)

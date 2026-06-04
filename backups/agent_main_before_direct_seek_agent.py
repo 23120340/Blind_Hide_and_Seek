@@ -1,19 +1,18 @@
-"""Combined seeker and hider optimized for the default Blind Hide and Seek map.
+"""
+Primary role-combined tournament agent.
 
-Seeker strategy:
-  - reconstruct the fixed map from the always-visible walls,
-  - run a coverage-oriented opening sweep while the hider is unseen,
-  - use full speed along straight path segments,
-  - pursue the visible hider directly, then search its last known area.
+Pacman uses trap-aware pursuit: when the Ghost is visible, it targets cells
+that reduce the Ghost's escape options; otherwise it searches frontier cells.
 
-Hider strategy:
-  - follow one opponent-agnostic 200-step patrol optimized for blind survival,
-  - immediately interrupt the patrol whenever the seeker becomes visible,
-  - estimate recent seeker motion and prefer distance, broken line of sight,
-    junction mobility, and non-repeating escape moves.
+Ghost uses a fixed-map opening and a blended safety evaluator combining four
+signals:
+  - direct Pacman reachability and worst-case lunge distance,
+  - maze distance and a 7-step escape-potential lookahead,
+  - cycle awareness via articulation points and biconnected component size,
+  - Voronoi territory: cells the Ghost reaches before a speed-aware Pacman.
 
-The same logic is used against every opponent; the agent never reads or
-branches on opponent identity.
+The articulation-point analysis is computed lazily and cached across turns,
+so the per-step cost stays well within the time limit.
 """
 
 import sys
@@ -287,34 +286,6 @@ BLIND_PATROL_POSITIONS = [
     (13, 1),
     (13, 1),
 ]
-
-# A second ensemble pass keeps the proven opening, then moves the patrol into
-# a compact upper loop that remains unseen across a wider range of searches.
-# Encoding the tail as moves keeps the submitted strategy small while still
-# producing one fixed, opponent-agnostic route.
-_PATROL_DELTAS = {
-    "U": (-1, 0),
-    "D": (1, 0),
-    "L": (0, -1),
-    "R": (0, 1),
-    "S": (0, 0),
-}
-_ROBUST_PATROL_TAIL = (
-    "LUDSUUDDUDUDUUDULRLLUURRRRDSULLLRRRDDLLDSUDDRSRDDRSRUUDUDUDU"
-    "DUDUDUDUDUDURRUDUDLLDUDURRUULLUUDUDUDUDDUURRLLRLRRRSRRRRLRLL"
-    "LDULLRRDUDULSLLRLRRSLLRLLDUDUDU"
-)
-_patrol_cursor = BLIND_PATROL_POSITIONS[48]
-_robust_positions = []
-for _patrol_code in _ROBUST_PATROL_TAIL:
-    _patrol_delta = _PATROL_DELTAS[_patrol_code]
-    _patrol_cursor = (
-        _patrol_cursor[0] + _patrol_delta[0],
-        _patrol_cursor[1] + _patrol_delta[1],
-    )
-    _robust_positions.append(_patrol_cursor)
-BLIND_PATROL_POSITIONS[49:] = _robust_positions
-
 BLIND_PATROL_SCHEDULE = [
     (position, step)
     for step, position in enumerate(BLIND_PATROL_POSITIONS, 1)
@@ -582,7 +553,7 @@ class PacmanAgent(BasePacmanAgent, ArenaTools):
 
         if enemy_position is not None:
             self.seen_enemy_once = True
-            target = enemy_position
+            target = self._trap_target(enemy_position)
         elif self.fixed_map_mode and not self.seen_enemy_once:
             if step_number >= 16:
                 corner = (self.known.shape[0] - 2, self.known.shape[1] - 2)
